@@ -21,6 +21,7 @@ func NewPhotoRepoGormImpl(master *gorm.DB) PhotoRepo {
 func (p *PhotoRepoGormImpl) FindAllPhotos(ctx context.Context) (photos []models.Photo, err error) {
 	err = p.master.
 		Table("photos").
+		Preload("Comments").
 		Find(&photos).
 		Order("id ASC").
 		Error
@@ -32,6 +33,7 @@ func (p *PhotoRepoGormImpl) FindPhotoById(ctx context.Context, photoId string) (
 	err = p.master.
 		Table("photos").
 		Where("id = ?", photoId).
+		Preload("Comments").
 		Find(&photo).
 		Error
 

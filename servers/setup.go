@@ -10,12 +10,17 @@ import (
 	photohdl "github.com/Retrospective53/myGram/module/handler/photo"
 	photorepo "github.com/Retrospective53/myGram/module/repository/photo"
 	photosvc "github.com/Retrospective53/myGram/module/service/photo"
+
+	commenthdl "github.com/Retrospective53/myGram/module/handler/comment"
+	commentrepo "github.com/Retrospective53/myGram/module/repository/comment"
+	commentsvc "github.com/Retrospective53/myGram/module/service/comment"
 	// c "github.com/Retrospective53/go-common/pkg/context"
 )
 
 type handlers struct {
 	accountHdl accounthdl.UserHandler
 	photoHdl photohdl.PhotoHandler
+	commentHdl commenthdl.CommentHandler
 }
 
 func initDI() handlers {
@@ -28,8 +33,13 @@ func initDI() handlers {
 	photoSvc := photosvc.NewPhotoServiceImpl(photoRepo)
 	photoHdl := photohdl.NewPhotoHandlerImpl(photoSvc)
 
+	commentRepo := commentrepo.NewCommentRepoGormImpl(pgConn)
+	commentSvc := commentsvc.NewCommentServiceImpl(commentRepo)
+	commentHdl := commenthdl.NewCommentHandlerImpl(commentSvc)
+
 	return handlers{
 		accountHdl: accountHdl,
 		photoHdl: photoHdl,
+		commentHdl: commentHdl,
 	}
 }
