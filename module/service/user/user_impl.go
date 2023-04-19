@@ -198,5 +198,6 @@ func (a *UserServiceImpl) GetAccountSvc(ctx context.Context, userId string) (acc
 		Username:  acc.Username,
 		Role:      acc.Role,
 		CreatedAt: acc.CreatedAt,
+		Photos: acc.Photos,
 	}, err
 }

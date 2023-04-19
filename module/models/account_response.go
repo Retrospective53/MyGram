@@ -11,6 +11,7 @@ type AccountResponse struct {
 	Username  string      `json:"username"`
 	Role      AccountRole `json:"role"`
 	CreatedAt time.Time   `json:"created_at"`
+	Photos []Photo `json:"photos"`
 }
 
 type AccountResponseWithPassword struct {

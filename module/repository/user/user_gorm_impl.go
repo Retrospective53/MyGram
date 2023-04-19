@@ -51,6 +51,7 @@ func (a *AccountRepoGormImpl) GetAccountByUserName(ctx context.Context, username
 	err = a.master.
 		Table("users").
 		Where("username = ?", username).
+		Preload("Photos").
 		Find(&account).Error
 	if err != nil {
 		return
@@ -63,6 +64,7 @@ func (a *AccountRepoGormImpl) GetAccountByUserId(ctx context.Context, userId str
 	err = a.master.
 		Table("users").
 		Where("id = ?", userId).
+		Preload("Photos").
 		Find(&account).Error
 
 	if err != nil {
