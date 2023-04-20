@@ -14,6 +14,10 @@ import (
 	commenthdl "github.com/Retrospective53/myGram/module/handler/comment"
 	commentrepo "github.com/Retrospective53/myGram/module/repository/comment"
 	commentsvc "github.com/Retrospective53/myGram/module/service/comment"
+
+	socialmediahdl "github.com/Retrospective53/myGram/module/handler/socialmedia"
+	socialmediarepo "github.com/Retrospective53/myGram/module/repository/socialmedia"
+	socialmediasvc "github.com/Retrospective53/myGram/module/service/socialmedia"
 	// c "github.com/Retrospective53/go-common/pkg/context"
 )
 
@@ -21,6 +25,7 @@ type handlers struct {
 	accountHdl accounthdl.UserHandler
 	photoHdl photohdl.PhotoHandler
 	commentHdl commenthdl.CommentHandler
+	socialMediaHdl socialmediahdl.SocialMediaHandler
 }
 
 func initDI() handlers {
@@ -37,9 +42,14 @@ func initDI() handlers {
 	commentSvc := commentsvc.NewCommentServiceImpl(commentRepo)
 	commentHdl := commenthdl.NewCommentHandlerImpl(commentSvc)
 
+	socialMediaRepo := socialmediarepo.NewSocialMediaRepoGormImpl(pgConn)
+	socialMediaSvc := socialmediasvc.NewSocialMediaServiceImpl(socialMediaRepo)
+	socialMediaHdl := socialmediahdl.NewSocialMediaHandlerImpl(socialMediaSvc)
+
 	return handlers{
 		accountHdl: accountHdl,
 		photoHdl: photoHdl,
 		commentHdl: commentHdl,
+		socialMediaHdl: socialMediaHdl,
 	}
 }

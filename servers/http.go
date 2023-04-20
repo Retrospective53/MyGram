@@ -8,6 +8,7 @@ import (
 	"github.com/Retrospective53/myGram/config"
 	"github.com/Retrospective53/myGram/module/router/comment"
 	"github.com/Retrospective53/myGram/module/router/photo"
+	"github.com/Retrospective53/myGram/module/router/socialmedia"
 	"github.com/Retrospective53/myGram/module/router/user"
 	"github.com/gin-gonic/gin"
 )
@@ -32,6 +33,7 @@ func NewHttpServer() (srv *http.Server) {
 	user.NewAccountRouter(v1, hdls.accountHdl)
 	photo.NewPhotoRouter(v1, hdls.photoHdl)
 	comment.NewCommentRouter(v1, hdls.commentHdl)
+	socialmedia.NewSocialMediaRouter(v1, hdls.socialMediaHdl)
 	ginServer.Run(config.Port)
 
 	// srv = &http.Server{
