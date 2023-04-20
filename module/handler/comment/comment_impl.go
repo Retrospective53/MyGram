@@ -156,6 +156,60 @@ func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
 		return
 	}
 
+
+	// authorization only admin
+	if accessClaim.Role != "ROLE_ADMIN" {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse{
+			Message: response.Unauthorized,
+			Error: "Unauthorized",
+		})
+		return
+	}
+
+	// //get basicauth username and password
+	// // Retrieve the value and check if the key exists
+	// basicClaimRaw, ok := ctx.Get("userBasic")
+
+	// // Check if the key exists
+	// if !ok {
+	// 	// Handle the case when the key does not exist
+	// 	err := errors.New("error getting basic auth claim from context")
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+	// 		Message: response.InvalidPayload,
+	// 		Error:   "invalid username and password",
+	// 	})
+	// 	return
+	// }
+
+	// // Convert the value to the expected type
+	// basicClaim, ok := basicClaimRaw.(map[string]string)
+
+	// // Check if the conversion was successful
+	// if !ok {
+	// 	// Handle the case when the value is not of the expected type
+	// 	err := errors.New("error converting basic auth claim to map[string]string")
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+	// 		Message: response.InvalidPayload,
+	// 		Error:   "invalid username and password",
+	// 	})
+	// 	return
+	// }
+
+	// // Now you can access the values in the basicClaim map
+	// if basicClaim["username"] != "admin" || basicClaim["password"] != "admin" {
+	// 	ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+	// 		Message: response.InvalidPayload,
+	// 		Error:   "invalid username and password",
+	// 	})
+	// 	return
+	// }
+
 	comment, err := c.commentService.UpdateCommentSvc(ctx, updateComment, commentId)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
@@ -173,8 +227,39 @@ func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
 func (c *CommentHandlerImpl) DeleteCommentByIdHdl(ctx *gin.Context) {
 	commentId := ctx.Param("id")
 
+	// get user_id from context first
+	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
+	if !ok {
+		err := errors.New("error get claim from context")
+		if err != nil {
+			panic(err)
+		}
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+			Message: response.InvalidPayload,
+			Error:   "invalid user id",
+		})
+		return
+	}
 
-	comment, err := c.commentService.DeleteCommentByIdSvc(ctx, commentId)
+	var accessClaim token.AccessClaim
+	if err := json.ObjectMapper(accessClaimI, &accessClaim); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+			Message: response.InvalidPayload,
+			Error:   "invalid payload",
+		})
+		return
+	}
+
+	// authorization only admin
+	if accessClaim.Role != "ROLE_ADMIN" {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse{
+			Message: response.Unauthorized,
+			Error: "Unauthorized",
+		})
+		return
+	}
+
+	_, err := c.commentService.DeleteCommentByIdSvc(ctx, commentId)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -184,6 +269,6 @@ func (c *CommentHandlerImpl) DeleteCommentByIdHdl(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    comment,
+		Data:    "comment deleted",
 	})
 }
