@@ -4,7 +4,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/Retrospective53/myGram/module/models"
 	photoCreateModel "github.com/Retrospective53/myGram/module/models/photo"
@@ -319,21 +318,21 @@ func (p *PhotoHandlerImpl) DeletePhotoByIdHdl(ctx *gin.Context) {
 	})
 }
 
-func (p *PhotoHandlerImpl) getIdFromParam(ctx *gin.Context) (idUint uint64, err error) {
-	id := ctx.Param("id")
+// func (p *PhotoHandlerImpl) getIdFromParam(ctx *gin.Context) (idUint uint64, err error) {
+// 	id := ctx.Param("id")
 
-	// transform id string to uint64
-	idUint, err = strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, response.ErrorResponse{
-			Message:  "failed to find photo",
-			Error: response.InvalidParam,
-		})
-		return
-	}
+// 	// transform id string to uint64
+// 	idUint, err = strconv.ParseUint(id, 10, 64)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusBadRequest, response.ErrorResponse{
+// 			Message:  "failed to find photo",
+// 			Error: response.InvalidParam,
+// 		})
+// 		return
+// 	}
 
-	return
-}
+// 	return
+// }
 
 func (p *PhotoHandlerImpl) getIdFromParamStr(ctx *gin.Context) (id string) {
 	id = ctx.Param("id")
