@@ -27,6 +27,31 @@ func NewPhotoHandlerImpl(photoService photoservice.PhotoService) PhotoHandler {
 }
 
 
+
+// @BasePath /api/v1/photo
+
+// @Tags Photo
+// @Summary finds all photo records
+// @Schemes http
+// @Description fetch all photo records
+// @Accept json
+// @Param Authorization header string true "Bearer Token"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /photo/all [get]
+
+// @Tags Photo
+// @Summary finds all photo records
+// @Schemes http
+// @Description fetch all photo records
+// @Param Authorization header string true "Bearer Token"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{data=[]string}
+// @Success 401 {object} response.SuccessResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /photo/all [get]
 func (p *PhotoHandlerImpl) FindAllPhotosHdl(ctx *gin.Context) {
 	photos, err := p.photoService.FindAllPhotosSvc(ctx)
 	if err != nil {
@@ -42,6 +67,19 @@ func (p *PhotoHandlerImpl) FindAllPhotosHdl(ctx *gin.Context) {
 	})
 }
 
+// @Tags Photo
+// @Summary Find a photo by ID
+// @Schemes http
+// @Description Fetch a photo with the given id
+// @Accept json
+// @Param id path string true "Photo ID"
+// @Param Authorization header string true "Bearer Token"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 401 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /photo/{id} [get]
 func (p *PhotoHandlerImpl) FindPhotoByIdHdl(ctx *gin.Context) {
 	photoId := p.getIdFromParamStr(ctx)
 
@@ -68,6 +106,19 @@ func (p *PhotoHandlerImpl) FindPhotoByIdHdl(ctx *gin.Context) {
 	})
 }
 
+
+// @Tags Photo
+// @Summary Create a new photo
+// @Schemes http
+// @Description Creates a new photo with the provided data
+// @Accept json
+// @Param body body photoCreateModel.PhotoCreate true "Create Photo Request Body"
+// @Param Authorization header string true "Bearer Token"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{data=object}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /photo [post]
 func (p *PhotoHandlerImpl) CreatePhotoHdl(ctx *gin.Context) {
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
@@ -120,6 +171,21 @@ func (p *PhotoHandlerImpl) CreatePhotoHdl(ctx *gin.Context) {
 	})
 }
 
+
+// @Tags Photo
+// @Summary Update an existing photo by id
+// @Schemes http
+// @Description Updates an existing photo with the provided data
+// @Accept json
+// @Param id path string true "Photo ID"
+// @Param Authorization header string true "Bearer Token"
+// @Param request body models.Photo true "Create Photo Request Body"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{data=object}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 401 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /photo/{id} [put]
 func (p *PhotoHandlerImpl) UpdatePhotoHdl(ctx *gin.Context) {
 	photoId := p.getIdFromParamStr(ctx)
 	
@@ -162,7 +228,7 @@ func (p *PhotoHandlerImpl) UpdatePhotoHdl(ctx *gin.Context) {
 	if accessClaim.Role != "ROLE_ADMIN" {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse{
 			Message: response.Unauthorized,
-			Error: "Unauthorized",
+			Error: "Unauthorized only admin is allowed lol",
 		})
 		return
 	}
@@ -175,12 +241,35 @@ func (p *PhotoHandlerImpl) UpdatePhotoHdl(ctx *gin.Context) {
 		})
 		return
 	}
+
+	if photo.PhotoURL == "" {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
+			Message: response.InvalidParam,
+			Error:   "photo not found",
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
 		Data:    photo,
 	})
 }
 
+
+// @Tags Photo
+// @Summary Delete a photo by ID
+// @Schemes http
+// @Description Deletes a photo with the given id
+// @Accept json
+// @Param id path string true "Photo ID"
+// @Param Authorization header string true "Bearer Token"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 401 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /photo/{id} [delete]
 func (p *PhotoHandlerImpl) DeletePhotoByIdHdl(ctx *gin.Context) {
 	photoId := p.getIdFromParamStr(ctx)
 

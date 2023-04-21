@@ -14,7 +14,6 @@ type Photo struct {
 	Caption   string         `json:"caption" gorm:"column:caption"`
 	PhotoURL  string         `json:"photo_url" gorm:"column:photo_url;not null" valid:"required~Photo url is required"`
 	UserID    uuid.UUID      `json:"user_id" gorm:"column:user_id;type:char(36)"`
-	User      *User          `json:"user"`
 	CreatedAt time.Time      `json:"created_at" gorm:"column:created_at"`
 	UpdatedAt time.Time      `json:"updated_at" gorm:"column:updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"column:deleted_at"`

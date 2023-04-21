@@ -25,6 +25,17 @@ func NewCommentHandlerImpl(commentService commentservice.CommentService) Comment
 	}
 }
 
+
+// @Tags Comment
+// @Summary finds all comment records
+// @Schemes http
+// @Description fetch all comment records
+// @Param Authorization header string true "Bearer Token"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{data=[]string}
+// @Success 401 {object} response.SuccessResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /comment/all [get]
 func (c *CommentHandlerImpl) FindAllCommentsHdl(ctx *gin.Context) {
 	comments, err := c.commentService.FindAllCommentsSvc(ctx)
 	if err != nil {
@@ -40,6 +51,20 @@ func (c *CommentHandlerImpl) FindAllCommentsHdl(ctx *gin.Context) {
 	})
 }
 
+
+// @Tags Comment
+// @Summary Find a comment by ID
+// @Schemes http
+// @Description Fetch a comment with the given id
+// @Accept json
+// @Param id path string true "Comment ID"
+// @Param Authorization header string true "Bearer Token"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 401 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /comment/{id} [get]
 func (c *CommentHandlerImpl) FindCommentByIdHdl(ctx *gin.Context) {
 	commentId := ctx.Param("id")
 
@@ -66,6 +91,19 @@ func (c *CommentHandlerImpl) FindCommentByIdHdl(ctx *gin.Context) {
 	})
 }
 
+
+// @Tags Comment
+// @Summary Create a new comment
+// @Schemes http
+// @Description Creates a new comment with the provided data
+// @Accept json
+// @Param body body commentcreatemodel.CommentCreate true "Create Comment Request Body"
+// @Param Authorization header string true "Bearer Token"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{data=object}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /comment [post]
 func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
@@ -118,6 +156,21 @@ func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
 	})
 }
 
+
+// @Tags Comment
+// @Summary Update an existing photo by id
+// @Schemes http
+// @Description Updates an existing photo with the provided data
+// @Accept json
+// @Param id path string true "Photo ID"
+// @Param Authorization header string true "Bearer Token"
+// @Param request body models.Comment true "Create Comment Request Body"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{data=object}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 401 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /comment/{id} [put]
 func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
 	commentId := ctx.Param("id")
 	
@@ -218,12 +271,34 @@ func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
 		})
 		return
 	}
+
+	if comment.Message == "" {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
+			Message: response.InvalidParam,
+			Error:   "comment not found",
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
 		Data:    comment,
 	})
 }
 
+// @Tags Comment
+// @Summary Delete a comment by ID
+// @Schemes http
+// @Description Deletes a comment with the given id
+// @Accept json
+// @Param id path string true "Comment ID"
+// @Param Authorization header string true "Bearer Token"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 401 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /comment/{id} [delete]
 func (c *CommentHandlerImpl) DeleteCommentByIdHdl(ctx *gin.Context) {
 	commentId := ctx.Param("id")
 

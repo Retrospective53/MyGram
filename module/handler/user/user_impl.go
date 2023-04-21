@@ -23,6 +23,21 @@ func NewAccountHandlerImpl(accService accountservice.UserService) UserHandler {
 	}
 }
 
+
+
+// @BasePath /api/v1/account
+
+// @Tags User
+// @Summary finding user record
+// @Schemes http
+// @Description fetch user information by id
+// @Accept json
+// @Param body body models.LoginAccount true "Login Account Request Body"
+// @Produce json
+// @Success 202 {object} response.SuccessResponse{data=[]string}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /account/login [post]
 func (a *UserHandlerImpl) LoginAccount(ctx *gin.Context) {
 	// binding payload
 	var loginAccount models.LoginAccount
@@ -35,7 +50,6 @@ func (a *UserHandlerImpl) LoginAccount(ctx *gin.Context) {
 		)
 		return
 	}
-
 	tokens, err := a.accService.LoginAccountByUserNameSvc(ctx, loginAccount)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError,
@@ -52,6 +66,18 @@ func (a *UserHandlerImpl) LoginAccount(ctx *gin.Context) {
 	})
 }
 
+
+
+// @Tags User
+// @Summary create user
+// @Schemes http
+// @Description create user by inputing the correct user datas
+// @Accept json
+// @Param body body models.CreateAccount true "Create Account Request Body"
+// @Produce json
+// @Success 202 {object} response.SuccessResponse{data=object}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /account [post]
 func (a *UserHandlerImpl) CreateAccount(ctx *gin.Context) {
 	// binding payload
 	var createAccount models.CreateAccount
@@ -81,6 +107,18 @@ func (a *UserHandlerImpl) CreateAccount(ctx *gin.Context) {
 	})
 }
 
+
+// @Tags User
+// @Summary get user account 
+// @Schemes http
+// @Description get an user account
+// @Param Authorization header string true "Bearer Token"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{data=object}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 401 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /account [get]
 func (a *UserHandlerImpl) GetAccount(ctx *gin.Context) {
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())

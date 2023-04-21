@@ -13,7 +13,6 @@ type Socialmedia struct {
 	Name       string         `json:"name" gorm:"column:name;not null" valid:"required~Socialmedia name is required"`
 	SocialMediaURL string    `json:"social_media_url" gorm:"column:social_media_url;not null" valid:"required~Social media url is required"`
 	UserID     uuid.UUID      `json:"user_id"`
-	User      *User           `json:"user"`
 	CreatedAt time.Time      `json:"created_at" gorm:"column:created_at"`
 	UpdatedAt time.Time      `json:"updated_at" gorm:"column:updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"column:deleted_at"`
