@@ -7,7 +7,7 @@ import (
 )
 
 func NewPhotoRouter(v1 *gin.RouterGroup, photoHdl photohandler.PhotoHandler) {
-	g := v1.Group("/photo")
+	g := v1.Group("/photos")
 
 	// register all router
 	g.GET("/:id", middleware.BearerOAuth(), photoHdl.FindPhotoByIdHdl)

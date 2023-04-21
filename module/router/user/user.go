@@ -7,7 +7,7 @@ import (
 )
 
 func NewAccountRouter(v1 *gin.RouterGroup, accountHdl accounthandler.UserHandler) {
-	g := v1.Group("/account")
+	g := v1.Group("/accounts")
 
 	// register all router
 	g.POST("",

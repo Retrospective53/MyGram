@@ -7,7 +7,7 @@ import (
 )
 
 func NewSocialMediaRouter(v1 *gin.RouterGroup, socialMediaHdl socialmediahandler.SocialMediaHandler) {
-	g := v1.Group("/socialmedia")
+	g := v1.Group("/socialmedias")
 
 	// register all router
 	g.GET("/:id", middleware.BearerOAuth(), socialMediaHdl.FindSocialMediaByIdHdl)

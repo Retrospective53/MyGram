@@ -7,7 +7,7 @@ import (
 )
 
 func NewCommentRouter(v1 *gin.RouterGroup, commentHdl commenthandler.CommentHandler) {
-	g := v1.Group("/comment")
+	g := v1.Group("/comments")
 
 	// register all router
 	g.GET("/:id", middleware.BearerOAuth(), commentHdl.FindCommentByIdHdl)
