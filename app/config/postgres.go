@@ -7,13 +7,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
 type PostgresConfig struct {
-	Port              int
+	Port              string
 	Host              string
 	Username          string
 	Password          string
@@ -23,18 +24,39 @@ type PostgresConfig struct {
 	MaxIdleTime       int
 }
 
-var pgConfig = PostgresConfig{
-	Port:              5432,
-	Host:              "localhost",
-	Username:          "postgres",
-	Password:          "flanerie",
-	DBName:            "mygram",
-	MaxIdleConnection: 7,
-	MaxOpenConnection: 5,
-	MaxIdleTime:       int(30 * time.Minute),
+func loadPostgresConfig() PostgresConfig {
+	err := godotenv.Load("./.env")
+	if err != nil {
+		log.Fatalf("Error getting env %v\n", err)
+	}
+
+	var (
+		host              = os.Getenv("pgHost")
+		pgport            = os.Getenv("pgPort")
+		username          = os.Getenv("pgUsername")
+		password          = os.Getenv("pgPassword")
+		dbname            = os.Getenv("pgDBName")
+		maxIdleConnection = 7
+		maxOpenConnection = 5
+		maxIdleTime       = int(30 * time.Minute)
+	)
+
+	return PostgresConfig{
+		Host:              host,
+		Port:              pgport,
+		Username:          username,
+		Password:          password,
+		DBName:            dbname,
+		MaxIdleConnection: maxIdleConnection,
+		MaxOpenConnection: maxOpenConnection,
+		MaxIdleTime:       maxIdleTime,
+	}
 }
 
+
 func NewPostgresConfig() (db *sql.DB) {
+	pgConfig := loadPostgresConfig()
+
 	connString := fmt.Sprintf(`
 		host=%v
 		port=%v
@@ -99,6 +121,8 @@ func NewPostgresGormConn() (db *gorm.DB) {
 }
 
 func postgresDSN() string {
+	pgConfig := loadPostgresConfig()
+	
 	return fmt.Sprintf(`
 	host=%v
 	port=%v
@@ -116,6 +140,8 @@ func postgresDSN() string {
 }
 
 func postgresPoolConf(dbSQL *sql.DB) {
+	pgConfig := loadPostgresConfig()
+	
 	// set extended config
 	dbSQL.SetMaxIdleConns(pgConfig.MaxIdleConnection)
 	dbSQL.SetMaxOpenConns(pgConfig.MaxOpenConnection)

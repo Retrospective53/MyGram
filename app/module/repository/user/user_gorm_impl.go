@@ -3,22 +3,34 @@ package user
 import (
 	"context"
 	"log"
+	"os"
 
-	"github.com/Retrospective53/myGram/config"
 	"github.com/Retrospective53/myGram/module/models"
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
 
+var MIGRATE bool
 type AccountRepoGormImpl struct {
 	master *gorm.DB
 }
 
 func NewAccountRepoGormImpl(master *gorm.DB) UserRepo {
+	err := godotenv.Load("./.env")
+	if err != nil {
+		log.Fatalf("Error getting env %v\n", err)
+	}
+
+	migrateStr := os.Getenv("MIGRATE")
+	if migrateStr == "true" {
+		MIGRATE = true
+	}
+
 	userRepo := AccountRepoGormImpl{
 		master: master,
 	}
 
-	if config.MIGRATE {
+	if MIGRATE {
 		userRepo.doMigration()
 	}
 

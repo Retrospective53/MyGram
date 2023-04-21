@@ -110,7 +110,10 @@ func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
 	if !ok {
 		err := errors.New("error get claim from context")
 		if err != nil {
-			panic(err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+				Message: response.SomethingWentWrong,
+				Error:   err.Error(),
+			})
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,

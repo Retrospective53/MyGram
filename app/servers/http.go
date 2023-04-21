@@ -3,9 +3,12 @@ package servers
 import (
 	// "fmt"
 	// "log"
+	"fmt"
 	"net/http"
+	"os"
 
-	"github.com/Retrospective53/myGram/config"
+	"github.com/joho/godotenv"
+
 	"github.com/Retrospective53/myGram/module/router/comment"
 	"github.com/Retrospective53/myGram/module/router/photo"
 	"github.com/Retrospective53/myGram/module/router/socialmedia"
@@ -30,13 +33,18 @@ import (
 // @BasePath /
 // @schemes http
 func NewHttpServer() (srv *http.Server) {
+	err := godotenv.Load("./.env")
+	if err != nil {
+		panic(err)
+	}
+
 	hdls := initDI()
 
 	// init server
 	ginServer := gin.Default()
-	// if config.Load.Server.Env == config.ENV_PRODUCTION {
-	// 	gin.SetMode(gin.ReleaseMode)
-	// }
+	if os.Getenv("ENV_PROD") == "PRODUCTION" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
 	// init middleware
 	ginServer.Use(
@@ -55,7 +63,7 @@ func NewHttpServer() (srv *http.Server) {
 	photo.NewPhotoRouter(v1, hdls.photoHdl)
 	comment.NewCommentRouter(v1, hdls.commentHdl)
 	socialmedia.NewSocialMediaRouter(v1, hdls.socialMediaHdl)
-	ginServer.Run(config.Port)
+	ginServer.Run(fmt.Sprintf(":%v", os.Getenv("PORT")))
 
 
 	// srv = &http.Server{

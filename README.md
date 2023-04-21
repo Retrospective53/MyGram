@@ -60,3 +60,4 @@ This is the backend for MyGram, an application that allows users to save photos 
 ## Documentation
 
 This API is documented using Swagger and can be accessed at `<base-url>/swagger/index.html` after starting the server.
+Base url by default is "/api/v1".
