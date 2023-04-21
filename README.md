@@ -17,7 +17,7 @@ This is the backend for MyGram, an application that allows users to save photos 
 1. Clone the repository: `git clone <repository-url>`
 2. Install the dependencies: `go mod tidy`
 3. Create a Postgres database and update the database configuration in the `config` folder.
-4. Run the migrations: `go run migrate.go`
+4. Migrates the database
 5. Start the server: `go run main.go`
 
 ## Endpoints
@@ -60,13 +60,3 @@ This is the backend for MyGram, an application that allows users to save photos 
 ## Documentation
 
 This API is documented using Swagger and can be accessed at `<base-url>/swagger/index.html` after starting the server.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for more information.
-
-## Contributing
-
-Contributions are welcome! Please fork the repository and submit a pull request for any improvements or fixes.
-
-Note: Please make sure to check the documentation and version compatibility of these libraries before using them in your project.
