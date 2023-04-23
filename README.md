@@ -2,23 +2,24 @@
 
 This is the backend for MyGram, an application that allows users to save photos and make comments on other people's photos. It is built using Golang and utilizes various libraries and technologies for authentication, validation, and documentation.
 
-## Technologies Used
+## Dependencies
 
-- Golang
-- Postgres database with [GORM ORM](https://gorm.io/)
-- [Gin Gonic](https://github.com/gin-gonic/gin) web framework
-- [Go Validator](https://github.com/go-playground/validator) for field validations
-- [JsonWebToken](https://github.com/dgrijalva/jwt-go) for authentication
-- [Bcrypt](https://pkg.go.dev/golang.org/x/crypto/bcrypt) for password hashing
-- [Go Swagger](https://github.com/swaggo/swag) for API documentation using Go Swagger
+- [Postgres](https://www.postgresql.org/) database with ORM [GORM](https://gorm.io/)
+- [Gin Gonic](https://gin-gonic.com/) web framework
+- [Go Validator](https://github.com/go-playground/validator) package for field validations in the tables
+- [JsonWebToken](https://github.com/dgrijalva/jwt-go) for authentication process
+- [Bcrypt](https://golang.org/x/crypto/bcrypt) for password hashing
+- [Swagger](https://github.com/swaggo/gin-swagger) for API documentation using [Go Swagger](https://github.com/swaggo/swag)
 
 ## Installation
 
-1. Clone the repository: `git clone <repository-url>`
-2. Install the dependencies: `go mod tidy`
-3. Create a Postgres database and update the database configuration in the `config` folder.
-4. Migrates the database
-5. Start the server: `go run main.go`
+To install and run the project, you can use Docker Compose:
+
+1. Make sure Docker and Docker Compose are installed on your system.
+2. Clone the repository: `git clone <repository-url>`
+3. Change to the project directory: `cd MyGram`
+4. Start the Docker containers: `docker-compose up`
+5. The project will be running on `http://localhost:5000`
 
 ## Endpoints
 
@@ -60,4 +61,3 @@ This is the backend for MyGram, an application that allows users to save photos 
 ## Documentation
 
 This API is documented using Swagger and can be accessed at `<base-url>/swagger/index.html` after starting the server.
-Base url by default is "/api/v1".
