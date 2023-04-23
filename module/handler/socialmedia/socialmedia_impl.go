@@ -1,4 +1,4 @@
-package comment
+package socialmedia
 
 import (
 	"errors"
@@ -6,38 +6,38 @@ import (
 	"net/http"
 
 	"github.com/Retrospective53/myGram/module/models"
-	commentcreatemodel "github.com/Retrospective53/myGram/module/models/comment"
+	socialmediacreatemodel "github.com/Retrospective53/myGram/module/models/socialmedia"
 	"github.com/Retrospective53/myGram/module/models/token"
-	commentservice "github.com/Retrospective53/myGram/module/service/comment"
+	socialmeidaservice "github.com/Retrospective53/myGram/module/service/socialmedia"
 	"github.com/Retrospective53/myGram/pkg/json"
 	"github.com/Retrospective53/myGram/pkg/middleware"
 	"github.com/Retrospective53/myGram/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 
-type CommentHandlerImpl struct {
-	commentService commentservice.CommentService
+type SocialMediaHandlerImpl struct {
+	socialMediaService socialmeidaservice.SocialMediaService
 }
 
-func NewCommentHandlerImpl(commentService commentservice.CommentService) CommentHandler {
-	return &CommentHandlerImpl{
-		commentService: commentService,
+func NewSocialMediaHandlerImpl(socialMediaService socialmeidaservice.SocialMediaService) SocialMediaHandler {
+	return &SocialMediaHandlerImpl{
+		socialMediaService: socialMediaService,
 	}
 }
 
 
-// @Tags Comment
-// @Summary finds all comment records
+// @Tags Social Media
+// @Summary finds all social media records
 // @Schemes http
-// @Description fetch all comment records
+// @Description fetch all social media records
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{data=[]string}
+// @Success 200 {object} response.SuccessResponse{data=[]models.Socialmedia}
 // @Success 401 {object} response.SuccessResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /comments/all [get]
-func (c *CommentHandlerImpl) FindAllCommentsHdl(ctx *gin.Context) {
-	comments, err := c.commentService.FindAllCommentsSvc(ctx)
+// @Router /socialmedias/all [get]
+func (s *SocialMediaHandlerImpl) FindAllSocialMediasHdl(ctx *gin.Context) {
+	socialMedias, err := s.socialMediaService.FindAllSocialMediaSvc(ctx)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -47,28 +47,28 @@ func (c *CommentHandlerImpl) FindAllCommentsHdl(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    comments,
+		Data:    socialMedias,
 	})
 }
 
 
-// @Tags Comment
-// @Summary Find a comment by ID
+// @Tags Social Media
+// @Summary Find a social media by ID
 // @Schemes http
-// @Description Fetch a comment with the given id
+// @Description Fetch a social media with the given id
 // @Accept json
-// @Param id path string true "Comment ID"
+// @Param id path string true "SocialMedia ID"
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{}
+// @Success 200 {object} response.SuccessResponse{data=models.Socialmedia}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /comments/{id} [get]
-func (c *CommentHandlerImpl) FindCommentByIdHdl(ctx *gin.Context) {
-	commentId := ctx.Param("id")
+// @Router /socialmedias/{id} [get]
+func (s *SocialMediaHandlerImpl) FindSocialMediaByIdHdl(ctx *gin.Context) {
+	socialMediaId := ctx.Param("id")
 
-	comment, err := c.commentService.FindCommentByIdSvc(ctx, commentId)
+	socialMedia, err := s.socialMediaService.FindSocialMediaByIdSvc(ctx, socialMediaId)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -77,7 +77,7 @@ func (c *CommentHandlerImpl) FindCommentByIdHdl(ctx *gin.Context) {
 		return
 	}
 
-	if comment.Message == "" || comment.ID.String() == "" {
+	if socialMedia.Name == "" || socialMedia.ID.String() == "" {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InvalidParam,
 			Error:   "photo not found",
@@ -87,24 +87,23 @@ func (c *CommentHandlerImpl) FindCommentByIdHdl(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    comment,
+		Data:    socialMedia,
 	})
 }
 
-
-// @Tags Comment
-// @Summary Create a new comment
+// @Tags Social Media
+// @Summary Create a new social media
 // @Schemes http
-// @Description Creates a new comment with the provided data
+// @Description Creates a new social media with the provided data
 // @Accept json
-// @Param body body commentcreatemodel.CommentCreate true "Create Comment Request Body"
+// @Param body body socialmediacreatemodel.SocialMediaCreate true "Create Social Media Request Body"
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{data=object}
+// @Success 200 {object} response.SuccessResponse{data=models.Socialmedia}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /comments [post]
-func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
+// @Router /socialmedias [post]
+func (s *SocialMediaHandlerImpl) CreateSocialMediaHdl(ctx *gin.Context) {
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
 	if !ok {
@@ -114,7 +113,6 @@ func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
 				Message: response.SomethingWentWrong,
 				Error:   err.Error(),
 			})
-			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -133,10 +131,10 @@ func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
 	}
 
 		// binding payload
-		var createComment commentcreatemodel.CommentCreate
-		createComment.UserID = accessClaim.UserID
+		var createSocialMedia socialmediacreatemodel.SocialMediaCreate
+		createSocialMedia.UserID = accessClaim.UserID
 		log.Printf("%s data type is: %T", accessClaim.UserID, accessClaim.UserID)
-		if err := ctx.BindJSON(&createComment); err != nil {
+		if err := ctx.BindJSON(&createSocialMedia); err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest,
 				response.ErrorResponse{
 					Message: response.InvalidBody,
@@ -146,7 +144,7 @@ func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
 			return
 		}
 
-	comment, err := c.commentService.CreateCommentSvc(ctx, createComment, accessClaim.UserID)
+	socialMedia, err := s.socialMediaService.CreateSocialMediaSvc(ctx, createSocialMedia)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -156,31 +154,30 @@ func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    comment,
+		Data:    socialMedia,
 	})
 }
 
-
-// @Tags Comment
-// @Summary Update an existing photo by id
+// @Tags Social Media
+// @Summary Update an existing social media by id
 // @Schemes http
-// @Description Updates an existing photo with the provided data
+// @Description Updates an existing social media with the provided data
 // @Accept json
-// @Param id path string true "Photo ID"
+// @Param id path string true "SocialMedia ID"
 // @Param Authorization header string true "Bearer Token"
-// @Param request body models.Comment true "Create Comment Request Body"
+// @Param request body models.Comment true "Create Social Media Request Body"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{data=object}
+// @Success 200 {object} response.SuccessResponse{data=models.Socialmedia}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /comments/{id} [put]
-func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
-	commentId := ctx.Param("id")
+// @Router /socialmedias/{id} [put]
+func (s *SocialMediaHandlerImpl) UpdateSocialMediaHdl(ctx *gin.Context) {
+	socialMediaId := ctx.Param("id")
 	
 	// binding payload
-	var updateComment models.Comment
-	if err := ctx.BindJSON(&updateComment); err != nil {
+	var updateSocialMedia models.Socialmedia
+	if err := ctx.BindJSON(&updateSocialMedia); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest,
 			response.ErrorResponse{
 				Message: response.InvalidBody,
@@ -199,7 +196,6 @@ func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
 				Message: response.SomethingWentWrong,
 				Error:   err.Error(),
 			})
-			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -227,7 +223,7 @@ func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
 		return
 	}
 
-	comment, err := c.commentService.UpdateCommentSvc(ctx, updateComment, commentId)
+	socialMedia, err := s.socialMediaService.UpdateSocialMediaSvc(ctx, updateSocialMedia, socialMediaId)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -236,35 +232,34 @@ func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
 		return
 	}
 
-	if comment.Message == "" {
+	if socialMedia.Name == "" {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InvalidParam,
-			Error:   "comment not found",
+			Error:   "social media not found",
 		})
 		return
 	}
-
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    comment,
+		Data:    socialMedia,
 	})
 }
 
-// @Tags Comment
-// @Summary Delete a comment by ID
+// @Tags Social Media
+// @Summary Delete a social media by ID
 // @Schemes http
-// @Description Deletes a comment with the given id
+// @Description Deletes a social media with the given id
 // @Accept json
-// @Param id path string true "Comment ID"
+// @Param id path string true "Social Media ID"
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
 // @Success 200 {object} response.SuccessResponse{}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /comments/{id} [delete]
-func (c *CommentHandlerImpl) DeleteCommentByIdHdl(ctx *gin.Context) {
-	commentId := ctx.Param("id")
+// @Router /socialmedias/{id} [delete]
+func (s *SocialMediaHandlerImpl) DeleteSocialMediaByIdHdl(ctx *gin.Context) {
+	socialMediaId := ctx.Param("id")
 
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
@@ -275,7 +270,6 @@ func (c *CommentHandlerImpl) DeleteCommentByIdHdl(ctx *gin.Context) {
 				Message: response.SomethingWentWrong,
 				Error:   err.Error(),
 			})
-			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -293,6 +287,7 @@ func (c *CommentHandlerImpl) DeleteCommentByIdHdl(ctx *gin.Context) {
 		return
 	}
 
+
 	// authorization only admin
 	if accessClaim.Role != "ROLE_ADMIN" {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse{
@@ -302,7 +297,7 @@ func (c *CommentHandlerImpl) DeleteCommentByIdHdl(ctx *gin.Context) {
 		return
 	}
 
-	_, err := c.commentService.DeleteCommentByIdSvc(ctx, commentId)
+	_, err := s.socialMediaService.DeleteSocialMediaByIdSvc(ctx, socialMediaId)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -312,6 +307,7 @@ func (c *CommentHandlerImpl) DeleteCommentByIdHdl(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    "comment deleted",
+		Data:    "social media deleted",
 	})
 }
+

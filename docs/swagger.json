@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/account": {
+        "/accounts": {
             "get": {
                 "description": "get an user account",
                 "produces": [
@@ -35,7 +35,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.AccountResponse"
                                         }
                                     }
                                 }
@@ -97,7 +97,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.AccountResponse"
                                         }
                                     }
                                 }
@@ -113,7 +113,7 @@
                 }
             }
         },
-        "/account/login": {
+        "/accounts/login": {
             "post": {
                 "description": "fetch user information by id",
                 "consumes": [
@@ -149,10 +149,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string"
-                                            }
+                                            "$ref": "#/definitions/token.Tokens"
                                         }
                                     }
                                 }
@@ -174,7 +171,7 @@
                 }
             }
         },
-        "/comment": {
+        "/comments": {
             "post": {
                 "description": "Creates a new comment with the provided data",
                 "consumes": [
@@ -217,7 +214,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Comment"
                                         }
                                     }
                                 }
@@ -239,7 +236,7 @@
                 }
             }
         },
-        "/comment/all": {
+        "/comments/all": {
             "get": {
                 "description": "fetch all comment records",
                 "produces": [
@@ -272,7 +269,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string"
+                                                "$ref": "#/definitions/models.Comment"
                                             }
                                         }
                                     }
@@ -295,7 +292,7 @@
                 }
             }
         },
-        "/comment/{id}": {
+        "/comments/{id}": {
             "get": {
                 "description": "Fetch a comment with the given id",
                 "consumes": [
@@ -328,7 +325,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.SuccessResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Comment"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -400,7 +409,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Comment"
                                         }
                                     }
                                 }
@@ -483,7 +492,7 @@
                 }
             }
         },
-        "/photo": {
+        "/photos": {
             "post": {
                 "description": "Creates a new photo with the provided data",
                 "consumes": [
@@ -526,7 +535,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Photo"
                                         }
                                     }
                                 }
@@ -548,7 +557,7 @@
                 }
             }
         },
-        "/photo/all": {
+        "/photos/all": {
             "get": {
                 "description": "fetch all photo records",
                 "produces": [
@@ -581,7 +590,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string"
+                                                "$ref": "#/definitions/models.Photo"
                                             }
                                         }
                                     }
@@ -604,7 +613,7 @@
                 }
             }
         },
-        "/photo/{id}": {
+        "/photos/{id}": {
             "get": {
                 "description": "Fetch a photo with the given id",
                 "consumes": [
@@ -637,7 +646,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.SuccessResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Photo"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -709,7 +730,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Photo"
                                         }
                                     }
                                 }
@@ -792,7 +813,7 @@
                 }
             }
         },
-        "/socialmedia": {
+        "/socialmedias": {
             "post": {
                 "description": "Creates a new social media with the provided data",
                 "consumes": [
@@ -835,7 +856,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Socialmedia"
                                         }
                                     }
                                 }
@@ -857,7 +878,7 @@
                 }
             }
         },
-        "/socialmedia/all": {
+        "/socialmedias/all": {
             "get": {
                 "description": "fetch all social media records",
                 "produces": [
@@ -890,7 +911,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string"
+                                                "$ref": "#/definitions/models.Socialmedia"
                                             }
                                         }
                                     }
@@ -913,7 +934,7 @@
                 }
             }
         },
-        "/socialmedia/{id}": {
+        "/socialmedias/{id}": {
             "get": {
                 "description": "Fetch a social media with the given id",
                 "consumes": [
@@ -946,7 +967,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.SuccessResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Socialmedia"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1018,7 +1051,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Socialmedia"
                                         }
                                     }
                                 }
@@ -1121,6 +1154,41 @@
                 }
             }
         },
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.AccountResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Photo"
+                    }
+                },
+                "role": {
+                    "$ref": "#/definitions/models.AccountRole"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "models.AccountRole": {
             "type": "string",
             "enum": [
@@ -1133,7 +1201,30 @@
             ]
         },
         "models.Comment": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "photo_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
         },
         "models.CreateAccount": {
             "type": "object",
@@ -1178,7 +1269,65 @@
             }
         },
         "models.Photo": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "caption": {
+                    "type": "string"
+                },
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Comment"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "photo_url": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Socialmedia": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "social_media_url": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
         },
         "photo.PhotoCreate": {
             "type": "object",
@@ -1236,6 +1385,20 @@
                     "type": "string"
                 },
                 "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "token.Tokens": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "id_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
                     "type": "string"
                 }
             }

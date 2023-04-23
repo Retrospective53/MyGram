@@ -1,4 +1,4 @@
-package socialmedia
+package photo
 
 import (
 	"errors"
@@ -6,38 +6,53 @@ import (
 	"net/http"
 
 	"github.com/Retrospective53/myGram/module/models"
-	socialmediacreatemodel "github.com/Retrospective53/myGram/module/models/socialmedia"
+	photoCreateModel "github.com/Retrospective53/myGram/module/models/photo"
 	"github.com/Retrospective53/myGram/module/models/token"
-	socialmeidaservice "github.com/Retrospective53/myGram/module/service/socialmedia"
+	photoservice "github.com/Retrospective53/myGram/module/service/photo"
 	"github.com/Retrospective53/myGram/pkg/json"
 	"github.com/Retrospective53/myGram/pkg/middleware"
 	"github.com/Retrospective53/myGram/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 
-type SocialMediaHandlerImpl struct {
-	socialMediaService socialmeidaservice.SocialMediaService
+type PhotoHandlerImpl struct {
+	photoService photoservice.PhotoService
 }
 
-func NewSocialMediaHandlerImpl(socialMediaService socialmeidaservice.SocialMediaService) SocialMediaHandler {
-	return &SocialMediaHandlerImpl{
-		socialMediaService: socialMediaService,
+func NewPhotoHandlerImpl(photoService photoservice.PhotoService) PhotoHandler {
+	return &PhotoHandlerImpl{
+		photoService: photoService,
 	}
 }
 
 
-// @Tags Social Media
-// @Summary finds all social media records
+
+// @BasePath /api/v1/photo
+
+// @Tags Photo
+// @Summary finds all photo records
 // @Schemes http
-// @Description fetch all social media records
+// @Description fetch all photo records
+// @Accept json
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{data=[]string}
+// @Success 200 {object} response.SuccessResponse{}
+// @Failure 400 {object} response.ErrorResponse{}
+// @Failure 500 {object} response.ErrorResponse{}
+// @Router /photo/all [get]
+
+// @Tags Photo
+// @Summary finds all photo records
+// @Schemes http
+// @Description fetch all photo records
+// @Param Authorization header string true "Bearer Token"
+// @Produce json
+// @Success 200 {object} response.SuccessResponse{data=[]models.Photo}
 // @Success 401 {object} response.SuccessResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /socialmedias/all [get]
-func (s *SocialMediaHandlerImpl) FindAllSocialMediasHdl(ctx *gin.Context) {
-	socialMedias, err := s.socialMediaService.FindAllSocialMediaSvc(ctx)
+// @Router /photos/all [get]
+func (p *PhotoHandlerImpl) FindAllPhotosHdl(ctx *gin.Context) {
+	photos, err := p.photoService.FindAllPhotosSvc(ctx)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -47,28 +62,27 @@ func (s *SocialMediaHandlerImpl) FindAllSocialMediasHdl(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    socialMedias,
+		Data:    photos,
 	})
 }
 
-
-// @Tags Social Media
-// @Summary Find a social media by ID
+// @Tags Photo
+// @Summary Find a photo by ID
 // @Schemes http
-// @Description Fetch a social media with the given id
+// @Description Fetch a photo with the given id
 // @Accept json
-// @Param id path string true "SocialMedia ID"
+// @Param id path string true "Photo ID"
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{}
+// @Success 200 {object} response.SuccessResponse{data=models.Photo}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /socialmedias/{id} [get]
-func (s *SocialMediaHandlerImpl) FindSocialMediaByIdHdl(ctx *gin.Context) {
-	socialMediaId := ctx.Param("id")
+// @Router /photos/{id} [get]
+func (p *PhotoHandlerImpl) FindPhotoByIdHdl(ctx *gin.Context) {
+	photoId := p.getIdFromParamStr(ctx)
 
-	socialMedia, err := s.socialMediaService.FindSocialMediaByIdSvc(ctx, socialMediaId)
+	photo, err := p.photoService.FindPhotoByIdSvc(ctx, photoId)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -77,7 +91,7 @@ func (s *SocialMediaHandlerImpl) FindSocialMediaByIdHdl(ctx *gin.Context) {
 		return
 	}
 
-	if socialMedia.Name == "" || socialMedia.ID.String() == "" {
+	if photo.Title == "" || photo.PhotoURL == "" {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InvalidParam,
 			Error:   "photo not found",
@@ -87,23 +101,24 @@ func (s *SocialMediaHandlerImpl) FindSocialMediaByIdHdl(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    socialMedia,
+		Data:    photo,
 	})
 }
 
-// @Tags Social Media
-// @Summary Create a new social media
+
+// @Tags Photo
+// @Summary Create a new photo
 // @Schemes http
-// @Description Creates a new social media with the provided data
+// @Description Creates a new photo with the provided data
 // @Accept json
-// @Param body body socialmediacreatemodel.SocialMediaCreate true "Create Social Media Request Body"
+// @Param body body photoCreateModel.PhotoCreate true "Create Photo Request Body"
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{data=object}
+// @Success 200 {object} response.SuccessResponse{data=models.Photo}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /socialmedias [post]
-func (s *SocialMediaHandlerImpl) CreateSocialMediaHdl(ctx *gin.Context) {
+// @Router /photos [post]
+func (p *PhotoHandlerImpl) CreatePhotoHdl(ctx *gin.Context) {
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
 	if !ok {
@@ -131,10 +146,10 @@ func (s *SocialMediaHandlerImpl) CreateSocialMediaHdl(ctx *gin.Context) {
 	}
 
 		// binding payload
-		var createSocialMedia socialmediacreatemodel.SocialMediaCreate
-		createSocialMedia.UserID = accessClaim.UserID
+		var createPhoto photoCreateModel.PhotoCreate
+		createPhoto.UserID = accessClaim.UserID
 		log.Printf("%s data type is: %T", accessClaim.UserID, accessClaim.UserID)
-		if err := ctx.BindJSON(&createSocialMedia); err != nil {
+		if err := ctx.BindJSON(&createPhoto); err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest,
 				response.ErrorResponse{
 					Message: response.InvalidBody,
@@ -144,7 +159,7 @@ func (s *SocialMediaHandlerImpl) CreateSocialMediaHdl(ctx *gin.Context) {
 			return
 		}
 
-	socialMedia, err := s.socialMediaService.CreateSocialMediaSvc(ctx, createSocialMedia)
+	photo, err := p.photoService.CreatePhotoSvc(ctx, createPhoto, accessClaim.UserID)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -154,30 +169,31 @@ func (s *SocialMediaHandlerImpl) CreateSocialMediaHdl(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    socialMedia,
+		Data:    photo,
 	})
 }
 
-// @Tags Social Media
-// @Summary Update an existing social media by id
+
+// @Tags Photo
+// @Summary Update an existing photo by id
 // @Schemes http
-// @Description Updates an existing social media with the provided data
+// @Description Updates an existing photo with the provided data
 // @Accept json
-// @Param id path string true "SocialMedia ID"
+// @Param id path string true "Photo ID"
 // @Param Authorization header string true "Bearer Token"
-// @Param request body models.Comment true "Create Social Media Request Body"
+// @Param request body models.Photo true "Create Photo Request Body"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{data=object}
+// @Success 200 {object} response.SuccessResponse{data=models.Photo}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /socialmedias/{id} [put]
-func (s *SocialMediaHandlerImpl) UpdateSocialMediaHdl(ctx *gin.Context) {
-	socialMediaId := ctx.Param("id")
+// @Router /photos/{id} [put]
+func (p *PhotoHandlerImpl) UpdatePhotoHdl(ctx *gin.Context) {
+	photoId := p.getIdFromParamStr(ctx)
 	
 	// binding payload
-	var updateSocialMedia models.Socialmedia
-	if err := ctx.BindJSON(&updateSocialMedia); err != nil {
+	var updatePhoto models.Photo
+	if err := ctx.BindJSON(&updatePhoto); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest,
 			response.ErrorResponse{
 				Message: response.InvalidBody,
@@ -213,17 +229,16 @@ func (s *SocialMediaHandlerImpl) UpdateSocialMediaHdl(ctx *gin.Context) {
 		return
 	}
 
-
 	// authorization only admin
 	if accessClaim.Role != "ROLE_ADMIN" {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse{
 			Message: response.Unauthorized,
-			Error: "Unauthorized",
+			Error: "Unauthorized only admin is allowed lol",
 		})
 		return
 	}
 
-	socialMedia, err := s.socialMediaService.UpdateSocialMediaSvc(ctx, updateSocialMedia, socialMediaId)
+	photo, err := p.photoService.UpdatePhotoSvc(ctx, updatePhoto, photoId)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -232,34 +247,36 @@ func (s *SocialMediaHandlerImpl) UpdateSocialMediaHdl(ctx *gin.Context) {
 		return
 	}
 
-	if socialMedia.Name == "" {
+	if photo.PhotoURL == "" {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InvalidParam,
-			Error:   "social media not found",
+			Error:   "photo not found",
 		})
 		return
 	}
+
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    socialMedia,
+		Data:    photo,
 	})
 }
 
-// @Tags Social Media
-// @Summary Delete a social media by ID
+
+// @Tags Photo
+// @Summary Delete a photo by ID
 // @Schemes http
-// @Description Deletes a social media with the given id
+// @Description Deletes a photo with the given id
 // @Accept json
-// @Param id path string true "Social Media ID"
+// @Param id path string true "Photo ID"
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
 // @Success 200 {object} response.SuccessResponse{}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /socialmedias/{id} [delete]
-func (s *SocialMediaHandlerImpl) DeleteSocialMediaByIdHdl(ctx *gin.Context) {
-	socialMediaId := ctx.Param("id")
+// @Router /photos/{id} [delete]
+func (p *PhotoHandlerImpl) DeletePhotoByIdHdl(ctx *gin.Context) {
+	photoId := p.getIdFromParamStr(ctx)
 
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
@@ -287,7 +304,6 @@ func (s *SocialMediaHandlerImpl) DeleteSocialMediaByIdHdl(ctx *gin.Context) {
 		return
 	}
 
-
 	// authorization only admin
 	if accessClaim.Role != "ROLE_ADMIN" {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse{
@@ -297,7 +313,7 @@ func (s *SocialMediaHandlerImpl) DeleteSocialMediaByIdHdl(ctx *gin.Context) {
 		return
 	}
 
-	_, err := s.socialMediaService.DeleteSocialMediaByIdSvc(ctx, socialMediaId)
+	_, err := p.photoService.DeletePhotoByIdSvc(ctx, photoId)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -307,7 +323,38 @@ func (s *SocialMediaHandlerImpl) DeleteSocialMediaByIdHdl(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    "social media deleted",
+		Data:    "photo deleted",
 	})
 }
 
+// func (p *PhotoHandlerImpl) getIdFromParam(ctx *gin.Context) (idUint uint64, err error) {
+// 	id := ctx.Param("id")
+
+// 	// transform id string to uint64
+// 	idUint, err = strconv.ParseUint(id, 10, 64)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusBadRequest, response.ErrorResponse{
+// 			Message:  "failed to find photo",
+// 			Error: response.InvalidParam,
+// 		})
+// 		return
+// 	}
+
+// 	return
+// }
+
+func (p *PhotoHandlerImpl) getIdFromParamStr(ctx *gin.Context) (id string) {
+	id = ctx.Param("id")
+
+	// // transform id string to uint64
+	// idUint, err = strconv.ParseUint(id, 10, 64)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusBadRequest, response.ErrorResponse{
+	// 		Message:  "failed to find photo",
+	// 		Error: response.InvalidParam,
+	// 	})
+	// 	return
+	// }
+
+	return
+}

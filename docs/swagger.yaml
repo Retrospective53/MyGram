@@ -11,6 +11,29 @@ definitions:
     - message
     - photo_id
     type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  models.AccountResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      photos:
+        items:
+          $ref: '#/definitions/models.Photo'
+        type: array
+      role:
+        $ref: '#/definitions/models.AccountRole'
+      username:
+        type: string
+    type: object
   models.AccountRole:
     enum:
     - admin
@@ -20,6 +43,21 @@ definitions:
     - ROLE_ADMIN
     - ROLE_NORMAL
   models.Comment:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: string
+      message:
+        type: string
+      photo_id:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
     type: object
   models.CreateAccount:
     properties:
@@ -51,6 +89,44 @@ definitions:
     - username
     type: object
   models.Photo:
+    properties:
+      caption:
+        type: string
+      comments:
+        items:
+          $ref: '#/definitions/models.Comment'
+        type: array
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: string
+      photo_url:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  models.Socialmedia:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: string
+      name:
+        type: string
+      social_media_url:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
     type: object
   photo.PhotoCreate:
     properties:
@@ -92,10 +168,19 @@ definitions:
     - name
     - social_media_url
     type: object
+  token.Tokens:
+    properties:
+      access_token:
+        type: string
+      id_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
-  /account:
+  /accounts:
     get:
       description: get an user account
       parameters:
@@ -114,7 +199,7 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  type: object
+                  $ref: '#/definitions/models.AccountResponse'
               type: object
         "400":
           description: Bad Request
@@ -152,7 +237,7 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  type: object
+                  $ref: '#/definitions/models.AccountResponse'
               type: object
         "500":
           description: Internal Server Error
@@ -161,7 +246,7 @@ paths:
       summary: create user
       tags:
       - User
-  /account/login:
+  /accounts/login:
     post:
       consumes:
       - application/json
@@ -183,9 +268,7 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  items:
-                    type: string
-                  type: array
+                  $ref: '#/definitions/token.Tokens'
               type: object
         "400":
           description: Bad Request
@@ -198,7 +281,7 @@ paths:
       summary: finding user record
       tags:
       - User
-  /comment:
+  /comments:
     post:
       consumes:
       - application/json
@@ -225,7 +308,7 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  type: object
+                  $ref: '#/definitions/models.Comment'
               type: object
         "400":
           description: Bad Request
@@ -238,7 +321,7 @@ paths:
       summary: Create a new comment
       tags:
       - Comment
-  /comment/{id}:
+  /comments/{id}:
     delete:
       consumes:
       - application/json
@@ -297,7 +380,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.SuccessResponse'
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Comment'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -344,7 +432,7 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  type: object
+                  $ref: '#/definitions/models.Comment'
               type: object
         "400":
           description: Bad Request
@@ -361,7 +449,7 @@ paths:
       summary: Update an existing photo by id
       tags:
       - Comment
-  /comment/all:
+  /comments/all:
     get:
       description: fetch all comment records
       parameters:
@@ -381,7 +469,7 @@ paths:
             - properties:
                 data:
                   items:
-                    type: string
+                    $ref: '#/definitions/models.Comment'
                   type: array
               type: object
         "401":
@@ -395,7 +483,7 @@ paths:
       summary: finds all comment records
       tags:
       - Comment
-  /photo:
+  /photos:
     post:
       consumes:
       - application/json
@@ -422,7 +510,7 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  type: object
+                  $ref: '#/definitions/models.Photo'
               type: object
         "400":
           description: Bad Request
@@ -435,7 +523,7 @@ paths:
       summary: Create a new photo
       tags:
       - Photo
-  /photo/{id}:
+  /photos/{id}:
     delete:
       consumes:
       - application/json
@@ -494,7 +582,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.SuccessResponse'
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Photo'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -541,7 +634,7 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  type: object
+                  $ref: '#/definitions/models.Photo'
               type: object
         "400":
           description: Bad Request
@@ -558,7 +651,7 @@ paths:
       summary: Update an existing photo by id
       tags:
       - Photo
-  /photo/all:
+  /photos/all:
     get:
       description: fetch all photo records
       parameters:
@@ -578,7 +671,7 @@ paths:
             - properties:
                 data:
                   items:
-                    type: string
+                    $ref: '#/definitions/models.Photo'
                   type: array
               type: object
         "401":
@@ -592,7 +685,7 @@ paths:
       summary: finds all photo records
       tags:
       - Photo
-  /socialmedia:
+  /socialmedias:
     post:
       consumes:
       - application/json
@@ -619,7 +712,7 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  type: object
+                  $ref: '#/definitions/models.Socialmedia'
               type: object
         "400":
           description: Bad Request
@@ -632,7 +725,7 @@ paths:
       summary: Create a new social media
       tags:
       - Social Media
-  /socialmedia/{id}:
+  /socialmedias/{id}:
     delete:
       consumes:
       - application/json
@@ -691,7 +784,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.SuccessResponse'
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Socialmedia'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -738,7 +836,7 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  type: object
+                  $ref: '#/definitions/models.Socialmedia'
               type: object
         "400":
           description: Bad Request
@@ -755,7 +853,7 @@ paths:
       summary: Update an existing social media by id
       tags:
       - Social Media
-  /socialmedia/all:
+  /socialmedias/all:
     get:
       description: fetch all social media records
       parameters:
@@ -775,7 +873,7 @@ paths:
             - properties:
                 data:
                   items:
-                    type: string
+                    $ref: '#/definitions/models.Socialmedia'
                   type: array
               type: object
         "401":

@@ -1,4 +1,4 @@
-package photo
+package comment
 
 import (
 	"errors"
@@ -6,53 +6,38 @@ import (
 	"net/http"
 
 	"github.com/Retrospective53/myGram/module/models"
-	photoCreateModel "github.com/Retrospective53/myGram/module/models/photo"
+	commentcreatemodel "github.com/Retrospective53/myGram/module/models/comment"
 	"github.com/Retrospective53/myGram/module/models/token"
-	photoservice "github.com/Retrospective53/myGram/module/service/photo"
+	commentservice "github.com/Retrospective53/myGram/module/service/comment"
 	"github.com/Retrospective53/myGram/pkg/json"
 	"github.com/Retrospective53/myGram/pkg/middleware"
 	"github.com/Retrospective53/myGram/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 
-type PhotoHandlerImpl struct {
-	photoService photoservice.PhotoService
+type CommentHandlerImpl struct {
+	commentService commentservice.CommentService
 }
 
-func NewPhotoHandlerImpl(photoService photoservice.PhotoService) PhotoHandler {
-	return &PhotoHandlerImpl{
-		photoService: photoService,
+func NewCommentHandlerImpl(commentService commentservice.CommentService) CommentHandler {
+	return &CommentHandlerImpl{
+		commentService: commentService,
 	}
 }
 
 
-
-// @BasePath /api/v1/photo
-
-// @Tags Photo
-// @Summary finds all photo records
+// @Tags Comment
+// @Summary finds all comment records
 // @Schemes http
-// @Description fetch all photo records
-// @Accept json
+// @Description fetch all comment records
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{}
-// @Failure 400 {object} response.ErrorResponse{}
-// @Failure 500 {object} response.ErrorResponse{}
-// @Router /photo/all [get]
-
-// @Tags Photo
-// @Summary finds all photo records
-// @Schemes http
-// @Description fetch all photo records
-// @Param Authorization header string true "Bearer Token"
-// @Produce json
-// @Success 200 {object} response.SuccessResponse{data=[]string}
+// @Success 200 {object} response.SuccessResponse{data=[]models.Comment}
 // @Success 401 {object} response.SuccessResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /photos/all [get]
-func (p *PhotoHandlerImpl) FindAllPhotosHdl(ctx *gin.Context) {
-	photos, err := p.photoService.FindAllPhotosSvc(ctx)
+// @Router /comments/all [get]
+func (c *CommentHandlerImpl) FindAllCommentsHdl(ctx *gin.Context) {
+	comments, err := c.commentService.FindAllCommentsSvc(ctx)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -62,27 +47,28 @@ func (p *PhotoHandlerImpl) FindAllPhotosHdl(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    photos,
+		Data:    comments,
 	})
 }
 
-// @Tags Photo
-// @Summary Find a photo by ID
+
+// @Tags Comment
+// @Summary Find a comment by ID
 // @Schemes http
-// @Description Fetch a photo with the given id
+// @Description Fetch a comment with the given id
 // @Accept json
-// @Param id path string true "Photo ID"
+// @Param id path string true "Comment ID"
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{}
+// @Success 200 {object} response.SuccessResponse{data=models.Comment}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /photos/{id} [get]
-func (p *PhotoHandlerImpl) FindPhotoByIdHdl(ctx *gin.Context) {
-	photoId := p.getIdFromParamStr(ctx)
+// @Router /comments/{id} [get]
+func (c *CommentHandlerImpl) FindCommentByIdHdl(ctx *gin.Context) {
+	commentId := ctx.Param("id")
 
-	photo, err := p.photoService.FindPhotoByIdSvc(ctx, photoId)
+	comment, err := c.commentService.FindCommentByIdSvc(ctx, commentId)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -91,7 +77,7 @@ func (p *PhotoHandlerImpl) FindPhotoByIdHdl(ctx *gin.Context) {
 		return
 	}
 
-	if photo.Title == "" || photo.PhotoURL == "" {
+	if comment.Message == "" || comment.ID.String() == "" {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InvalidParam,
 			Error:   "photo not found",
@@ -101,24 +87,24 @@ func (p *PhotoHandlerImpl) FindPhotoByIdHdl(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    photo,
+		Data:    comment,
 	})
 }
 
 
-// @Tags Photo
-// @Summary Create a new photo
+// @Tags Comment
+// @Summary Create a new comment
 // @Schemes http
-// @Description Creates a new photo with the provided data
+// @Description Creates a new comment with the provided data
 // @Accept json
-// @Param body body photoCreateModel.PhotoCreate true "Create Photo Request Body"
+// @Param body body commentcreatemodel.CommentCreate true "Create Comment Request Body"
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{data=object}
+// @Success 200 {object} response.SuccessResponse{data=models.Comment}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /photos [post]
-func (p *PhotoHandlerImpl) CreatePhotoHdl(ctx *gin.Context) {
+// @Router /comments [post]
+func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
 	if !ok {
@@ -128,6 +114,7 @@ func (p *PhotoHandlerImpl) CreatePhotoHdl(ctx *gin.Context) {
 				Message: response.SomethingWentWrong,
 				Error:   err.Error(),
 			})
+			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -146,10 +133,10 @@ func (p *PhotoHandlerImpl) CreatePhotoHdl(ctx *gin.Context) {
 	}
 
 		// binding payload
-		var createPhoto photoCreateModel.PhotoCreate
-		createPhoto.UserID = accessClaim.UserID
+		var createComment commentcreatemodel.CommentCreate
+		createComment.UserID = accessClaim.UserID
 		log.Printf("%s data type is: %T", accessClaim.UserID, accessClaim.UserID)
-		if err := ctx.BindJSON(&createPhoto); err != nil {
+		if err := ctx.BindJSON(&createComment); err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest,
 				response.ErrorResponse{
 					Message: response.InvalidBody,
@@ -159,7 +146,7 @@ func (p *PhotoHandlerImpl) CreatePhotoHdl(ctx *gin.Context) {
 			return
 		}
 
-	photo, err := p.photoService.CreatePhotoSvc(ctx, createPhoto, accessClaim.UserID)
+	comment, err := c.commentService.CreateCommentSvc(ctx, createComment, accessClaim.UserID)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -169,31 +156,31 @@ func (p *PhotoHandlerImpl) CreatePhotoHdl(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    photo,
+		Data:    comment,
 	})
 }
 
 
-// @Tags Photo
+// @Tags Comment
 // @Summary Update an existing photo by id
 // @Schemes http
 // @Description Updates an existing photo with the provided data
 // @Accept json
 // @Param id path string true "Photo ID"
 // @Param Authorization header string true "Bearer Token"
-// @Param request body models.Photo true "Create Photo Request Body"
+// @Param request body models.Comment true "Create Comment Request Body"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{data=object}
+// @Success 200 {object} response.SuccessResponse{data=models.Comment}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /photos/{id} [put]
-func (p *PhotoHandlerImpl) UpdatePhotoHdl(ctx *gin.Context) {
-	photoId := p.getIdFromParamStr(ctx)
+// @Router /comments/{id} [put]
+func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
+	commentId := ctx.Param("id")
 	
 	// binding payload
-	var updatePhoto models.Photo
-	if err := ctx.BindJSON(&updatePhoto); err != nil {
+	var updateComment models.Comment
+	if err := ctx.BindJSON(&updateComment); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest,
 			response.ErrorResponse{
 				Message: response.InvalidBody,
@@ -212,6 +199,7 @@ func (p *PhotoHandlerImpl) UpdatePhotoHdl(ctx *gin.Context) {
 				Message: response.SomethingWentWrong,
 				Error:   err.Error(),
 			})
+			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -229,16 +217,17 @@ func (p *PhotoHandlerImpl) UpdatePhotoHdl(ctx *gin.Context) {
 		return
 	}
 
+
 	// authorization only admin
 	if accessClaim.Role != "ROLE_ADMIN" {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse{
 			Message: response.Unauthorized,
-			Error: "Unauthorized only admin is allowed lol",
+			Error: "Unauthorized",
 		})
 		return
 	}
 
-	photo, err := p.photoService.UpdatePhotoSvc(ctx, updatePhoto, photoId)
+	comment, err := c.commentService.UpdateCommentSvc(ctx, updateComment, commentId)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -247,36 +236,35 @@ func (p *PhotoHandlerImpl) UpdatePhotoHdl(ctx *gin.Context) {
 		return
 	}
 
-	if photo.PhotoURL == "" {
+	if comment.Message == "" {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InvalidParam,
-			Error:   "photo not found",
+			Error:   "comment not found",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    photo,
+		Data:    comment,
 	})
 }
 
-
-// @Tags Photo
-// @Summary Delete a photo by ID
+// @Tags Comment
+// @Summary Delete a comment by ID
 // @Schemes http
-// @Description Deletes a photo with the given id
+// @Description Deletes a comment with the given id
 // @Accept json
-// @Param id path string true "Photo ID"
+// @Param id path string true "Comment ID"
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
 // @Success 200 {object} response.SuccessResponse{}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /photos/{id} [delete]
-func (p *PhotoHandlerImpl) DeletePhotoByIdHdl(ctx *gin.Context) {
-	photoId := p.getIdFromParamStr(ctx)
+// @Router /comments/{id} [delete]
+func (c *CommentHandlerImpl) DeleteCommentByIdHdl(ctx *gin.Context) {
+	commentId := ctx.Param("id")
 
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
@@ -287,6 +275,7 @@ func (p *PhotoHandlerImpl) DeletePhotoByIdHdl(ctx *gin.Context) {
 				Message: response.SomethingWentWrong,
 				Error:   err.Error(),
 			})
+			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -313,7 +302,7 @@ func (p *PhotoHandlerImpl) DeletePhotoByIdHdl(ctx *gin.Context) {
 		return
 	}
 
-	_, err := p.photoService.DeletePhotoByIdSvc(ctx, photoId)
+	_, err := c.commentService.DeleteCommentByIdSvc(ctx, commentId)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse{
 			Message: response.InternalServer,
@@ -323,38 +312,6 @@ func (p *PhotoHandlerImpl) DeletePhotoByIdHdl(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response.SuccessResponse{
 		Message: "success",
-		Data:    "photo deleted",
+		Data:    "comment deleted",
 	})
-}
-
-// func (p *PhotoHandlerImpl) getIdFromParam(ctx *gin.Context) (idUint uint64, err error) {
-// 	id := ctx.Param("id")
-
-// 	// transform id string to uint64
-// 	idUint, err = strconv.ParseUint(id, 10, 64)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusBadRequest, response.ErrorResponse{
-// 			Message:  "failed to find photo",
-// 			Error: response.InvalidParam,
-// 		})
-// 		return
-// 	}
-
-// 	return
-// }
-
-func (p *PhotoHandlerImpl) getIdFromParamStr(ctx *gin.Context) (id string) {
-	id = ctx.Param("id")
-
-	// // transform id string to uint64
-	// idUint, err = strconv.ParseUint(id, 10, 64)
-	// if err != nil {
-	// 	ctx.JSON(http.StatusBadRequest, response.ErrorResponse{
-	// 		Message:  "failed to find photo",
-	// 		Error: response.InvalidParam,
-	// 	})
-	// 	return
-	// }
-
-	return
 }

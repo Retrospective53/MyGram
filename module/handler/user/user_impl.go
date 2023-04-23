@@ -34,7 +34,7 @@ func NewAccountHandlerImpl(accService accountservice.UserService) UserHandler {
 // @Accept json
 // @Param body body models.LoginAccount true "Login Account Request Body"
 // @Produce json
-// @Success 202 {object} response.SuccessResponse{data=[]string}
+// @Success 202 {object} response.SuccessResponse{data=token.Tokens}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
 // @Router /accounts/login [post]
@@ -75,7 +75,7 @@ func (a *UserHandlerImpl) LoginAccount(ctx *gin.Context) {
 // @Accept json
 // @Param body body models.CreateAccount true "Create Account Request Body"
 // @Produce json
-// @Success 202 {object} response.SuccessResponse{data=object}
+// @Success 202 {object} response.SuccessResponse{data=models.AccountResponse}
 // @Failure 500 {object} response.ErrorResponse{}
 // @Router /accounts [post]
 func (a *UserHandlerImpl) CreateAccount(ctx *gin.Context) {
@@ -114,7 +114,7 @@ func (a *UserHandlerImpl) CreateAccount(ctx *gin.Context) {
 // @Description get an user account
 // @Param Authorization header string true "Bearer Token"
 // @Produce json
-// @Success 200 {object} response.SuccessResponse{data=object}
+// @Success 200 {object} response.SuccessResponse{data=models.AccountResponse}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}

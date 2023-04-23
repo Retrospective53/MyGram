@@ -16,7 +16,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/account": {
+        "/accounts": {
             "get": {
                 "description": "get an user account",
                 "produces": [
@@ -47,7 +47,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.AccountResponse"
                                         }
                                     }
                                 }
@@ -109,7 +109,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.AccountResponse"
                                         }
                                     }
                                 }
@@ -125,7 +125,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/account/login": {
+        "/accounts/login": {
             "post": {
                 "description": "fetch user information by id",
                 "consumes": [
@@ -161,10 +161,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string"
-                                            }
+                                            "$ref": "#/definitions/token.Tokens"
                                         }
                                     }
                                 }
@@ -186,7 +183,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/comment": {
+        "/comments": {
             "post": {
                 "description": "Creates a new comment with the provided data",
                 "consumes": [
@@ -229,7 +226,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Comment"
                                         }
                                     }
                                 }
@@ -251,7 +248,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/comment/all": {
+        "/comments/all": {
             "get": {
                 "description": "fetch all comment records",
                 "produces": [
@@ -284,7 +281,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string"
+                                                "$ref": "#/definitions/models.Comment"
                                             }
                                         }
                                     }
@@ -307,7 +304,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/comment/{id}": {
+        "/comments/{id}": {
             "get": {
                 "description": "Fetch a comment with the given id",
                 "consumes": [
@@ -340,7 +337,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.SuccessResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Comment"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -412,7 +421,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Comment"
                                         }
                                     }
                                 }
@@ -495,7 +504,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/photo": {
+        "/photos": {
             "post": {
                 "description": "Creates a new photo with the provided data",
                 "consumes": [
@@ -538,7 +547,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Photo"
                                         }
                                     }
                                 }
@@ -560,7 +569,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/photo/all": {
+        "/photos/all": {
             "get": {
                 "description": "fetch all photo records",
                 "produces": [
@@ -593,7 +602,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string"
+                                                "$ref": "#/definitions/models.Photo"
                                             }
                                         }
                                     }
@@ -616,7 +625,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/photo/{id}": {
+        "/photos/{id}": {
             "get": {
                 "description": "Fetch a photo with the given id",
                 "consumes": [
@@ -649,7 +658,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.SuccessResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Photo"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -721,7 +742,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Photo"
                                         }
                                     }
                                 }
@@ -804,7 +825,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/socialmedia": {
+        "/socialmedias": {
             "post": {
                 "description": "Creates a new social media with the provided data",
                 "consumes": [
@@ -847,7 +868,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Socialmedia"
                                         }
                                     }
                                 }
@@ -869,7 +890,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/socialmedia/all": {
+        "/socialmedias/all": {
             "get": {
                 "description": "fetch all social media records",
                 "produces": [
@@ -902,7 +923,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string"
+                                                "$ref": "#/definitions/models.Socialmedia"
                                             }
                                         }
                                     }
@@ -925,7 +946,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/socialmedia/{id}": {
+        "/socialmedias/{id}": {
             "get": {
                 "description": "Fetch a social media with the given id",
                 "consumes": [
@@ -958,7 +979,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.SuccessResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Socialmedia"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1030,7 +1063,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/models.Socialmedia"
                                         }
                                     }
                                 }
@@ -1133,6 +1166,41 @@ const docTemplate = `{
                 }
             }
         },
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.AccountResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Photo"
+                    }
+                },
+                "role": {
+                    "$ref": "#/definitions/models.AccountRole"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "models.AccountRole": {
             "type": "string",
             "enum": [
@@ -1145,7 +1213,30 @@ const docTemplate = `{
             ]
         },
         "models.Comment": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "photo_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
         },
         "models.CreateAccount": {
             "type": "object",
@@ -1190,7 +1281,65 @@ const docTemplate = `{
             }
         },
         "models.Photo": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "caption": {
+                    "type": "string"
+                },
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Comment"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "photo_url": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Socialmedia": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "social_media_url": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
         },
         "photo.PhotoCreate": {
             "type": "object",
@@ -1248,6 +1397,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "token.Tokens": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "id_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
                     "type": "string"
                 }
             }
