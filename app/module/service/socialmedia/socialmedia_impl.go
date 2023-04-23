@@ -21,18 +21,12 @@ func NewSocialMediaServiceImpl(socialMediaRepo socialmediarepo.SocialMediaRepo) 
 
 func (s *SocialMediaServiceImpl) FindAllSocialMediaSvc(ctx context.Context) (socialMedias []models.Socialmedia, err error) {
 	socialMedias, err = s.socialMediaRepo.FindAllSocialMedia(ctx)
-	if err != nil {
-		panic(err)
-	}
 
 	return
 }
 
 func (s *SocialMediaServiceImpl) FindSocialMediaByIdSvc(ctx context.Context, socialMediaId string) (socialMedia models.Socialmedia, err error) {
 	socialMedia, err = s.socialMediaRepo.FindSocialMediaById(ctx, socialMediaId)
-	if err != nil {
-		panic(err)
-	}
 
 	return
 }
@@ -50,10 +44,6 @@ func (s *SocialMediaServiceImpl) CreateSocialMediaSvc(ctx context.Context, socia
 			SocialMediaURL: socialMediaIn.SocialMediaURL,
 			UserID: userUUID,
 		}, socialMediaIn.UserID)
-
-		if err != nil {
-			panic(err)
-		}
 	
 	return
 }
@@ -69,9 +59,6 @@ func (s *SocialMediaServiceImpl) UpdateSocialMediaSvc(ctx context.Context, socia
 
 func (s *SocialMediaServiceImpl) DeleteSocialMediaByIdSvc(ctx context.Context, socialMediaId string) (socialMedia models.Socialmedia, err error) {
 	err = s.socialMediaRepo.DeleteSocialMediaById(ctx, socialMediaId)
-	if err != nil {
-		panic(err)
-	}
 	
 	return
 }

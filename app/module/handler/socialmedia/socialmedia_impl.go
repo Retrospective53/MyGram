@@ -35,7 +35,7 @@ func NewSocialMediaHandlerImpl(socialMediaService socialmeidaservice.SocialMedia
 // @Success 200 {object} response.SuccessResponse{data=[]string}
 // @Success 401 {object} response.SuccessResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /socialmedia/all [get]
+// @Router /socialmedias/all [get]
 func (s *SocialMediaHandlerImpl) FindAllSocialMediasHdl(ctx *gin.Context) {
 	socialMedias, err := s.socialMediaService.FindAllSocialMediaSvc(ctx)
 	if err != nil {
@@ -64,7 +64,7 @@ func (s *SocialMediaHandlerImpl) FindAllSocialMediasHdl(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /socialmedia/{id} [get]
+// @Router /socialmedias/{id} [get]
 func (s *SocialMediaHandlerImpl) FindSocialMediaByIdHdl(ctx *gin.Context) {
 	socialMediaId := ctx.Param("id")
 
@@ -102,14 +102,17 @@ func (s *SocialMediaHandlerImpl) FindSocialMediaByIdHdl(ctx *gin.Context) {
 // @Success 200 {object} response.SuccessResponse{data=object}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /socialmedia [post]
+// @Router /socialmedias [post]
 func (s *SocialMediaHandlerImpl) CreateSocialMediaHdl(ctx *gin.Context) {
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
 	if !ok {
 		err := errors.New("error get claim from context")
 		if err != nil {
-			panic(err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+				Message: response.SomethingWentWrong,
+				Error:   err.Error(),
+			})
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -168,7 +171,7 @@ func (s *SocialMediaHandlerImpl) CreateSocialMediaHdl(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /socialmedia/{id} [put]
+// @Router /socialmedias/{id} [put]
 func (s *SocialMediaHandlerImpl) UpdateSocialMediaHdl(ctx *gin.Context) {
 	socialMediaId := ctx.Param("id")
 	
@@ -189,7 +192,10 @@ func (s *SocialMediaHandlerImpl) UpdateSocialMediaHdl(ctx *gin.Context) {
 	if !ok {
 		err := errors.New("error get claim from context")
 		if err != nil {
-			panic(err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+				Message: response.SomethingWentWrong,
+				Error:   err.Error(),
+			})
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -251,7 +257,7 @@ func (s *SocialMediaHandlerImpl) UpdateSocialMediaHdl(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /socialmedia/{id} [delete]
+// @Router /socialmedias/{id} [delete]
 func (s *SocialMediaHandlerImpl) DeleteSocialMediaByIdHdl(ctx *gin.Context) {
 	socialMediaId := ctx.Param("id")
 
@@ -260,7 +266,10 @@ func (s *SocialMediaHandlerImpl) DeleteSocialMediaByIdHdl(ctx *gin.Context) {
 	if !ok {
 		err := errors.New("error get claim from context")
 		if err != nil {
-			panic(err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+				Message: response.SomethingWentWrong,
+				Error:   err.Error(),
+			})
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,

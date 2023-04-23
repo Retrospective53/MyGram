@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: mygram_app
+    build: .
+    env_file:
+      - .env
+    environment:
+      - PORT=${PORT}
+      - MIGRATE=${MIGRATE}
+      - ENV_PROD=${ENV_PROD}
+      - pgPort=${pgPort}
+      - pgHost=${pgHost}
+      - pgUsername=${pgUsername}
+      - pgPassword=${pgPassword}
+      - pgDBName=${pgDBName}
+    ports:
+      - 5000:8080
+    restart: on-failure
+    volumes:
+      - api:/usr/src/app/
+    depends_on:
+      - mygram-postgres
+    networks:
+      - mygram
+
+  mygram-postgres:
+    image: postgres:alpine
+    container_name: mygram_postgres
+    environment:
+      - POSTGRES_USER=${pgUsername}
+      - POSTGRES_PASSWORD=${pgPassword}
+      - POSTGRES_DB=${pgDBName}
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-db:/var/lib/postgres
+    networks:
+      - mygram
+
+volumes:
+  api:
+  postgres-db:
+
+# Networks to be created to facilitate communication between containers
+networks:
+  mygram:
+    driver: bridge

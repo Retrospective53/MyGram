@@ -37,7 +37,7 @@ func NewAccountHandlerImpl(accService accountservice.UserService) UserHandler {
 // @Success 202 {object} response.SuccessResponse{data=[]string}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /account/login [post]
+// @Router /accounts/login [post]
 func (a *UserHandlerImpl) LoginAccount(ctx *gin.Context) {
 	// binding payload
 	var loginAccount models.LoginAccount
@@ -77,7 +77,7 @@ func (a *UserHandlerImpl) LoginAccount(ctx *gin.Context) {
 // @Produce json
 // @Success 202 {object} response.SuccessResponse{data=object}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /account [post]
+// @Router /accounts [post]
 func (a *UserHandlerImpl) CreateAccount(ctx *gin.Context) {
 	// binding payload
 	var createAccount models.CreateAccount
@@ -118,14 +118,18 @@ func (a *UserHandlerImpl) CreateAccount(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /account [get]
+// @Router /accounts [get]
 func (a *UserHandlerImpl) GetAccount(ctx *gin.Context) {
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
 	if !ok {
 		err := errors.New("error get claim from context")
 		if err != nil {
-			panic(err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+				Message: response.SomethingWentWrong,
+				Error:   err.Error(),
+			})
+			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,

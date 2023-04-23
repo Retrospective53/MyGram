@@ -25,7 +25,7 @@ func (a *UserServiceImpl) CreateAccountSvc(ctx context.Context, acc models.Creat
 	// need to hash password
 	hashedPassowrd, err := crypto.GenerateHash(acc.Password)
 	if err != nil {
-		panic(err)
+		return
 	}
 	// update passowrd with hashed password
 	acc.Password = hashedPassowrd
@@ -39,7 +39,7 @@ func (a *UserServiceImpl) CreateAccountSvc(ctx context.Context, acc models.Creat
 		Age: acc.Age,
 	})
 	// if err != nil {
-	// 	panic(err)
+	// 	return
 	// }
 
 	return models.AccountResponse{
@@ -97,7 +97,7 @@ func (a *UserServiceImpl) generateAllTokensConcurrent(ctx context.Context, useri
 		}
 		idToken, err = crypto.SignJWT(idTokenClaim)
 		if err != nil {
-			panic(err)
+			return
 		}
 	}(defaultClaim)
 
@@ -118,7 +118,7 @@ func (a *UserServiceImpl) generateAllTokensConcurrent(ctx context.Context, useri
 		}
 		accessToken, err = crypto.SignJWT(accessTokenClaim)
 		if err != nil {
-			panic(err)
+			return
 		}
 	}(defaultClaim)
 
@@ -134,7 +134,7 @@ func (a *UserServiceImpl) generateAllTokensConcurrent(ctx context.Context, useri
 		}
 		refreshToken, err = crypto.SignJWT(refreshTokenClaim)
 		if err != nil {
-			panic(err)
+			return
 		}
 	}(defaultClaim)
 
@@ -148,14 +148,14 @@ func (a *UserServiceImpl) LoginAccountByUserNameSvc(ctx context.Context, loginAc
 	// get account by username
 	acc, err := a.getAccountWithPassword(ctx, loginAcc.Username)
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	// compare password
 	// password acc -> hashed password
 	// password login acc -> plain password
 	if err = crypto.CompareHash(acc.Password, loginAcc.Password); err != nil {
-		panic(err)
+		return
 	}
 
 	// // record activity
@@ -177,7 +177,7 @@ func (a *UserServiceImpl) LoginAccountByUserNameSvc(ctx context.Context, loginAc
 		string(acc.Role))
 		// createdActivity.ID.String())
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	return token.Tokens{

@@ -35,7 +35,7 @@ func NewCommentHandlerImpl(commentService commentservice.CommentService) Comment
 // @Success 200 {object} response.SuccessResponse{data=[]string}
 // @Success 401 {object} response.SuccessResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /comment/all [get]
+// @Router /comments/all [get]
 func (c *CommentHandlerImpl) FindAllCommentsHdl(ctx *gin.Context) {
 	comments, err := c.commentService.FindAllCommentsSvc(ctx)
 	if err != nil {
@@ -64,7 +64,7 @@ func (c *CommentHandlerImpl) FindAllCommentsHdl(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /comment/{id} [get]
+// @Router /comments/{id} [get]
 func (c *CommentHandlerImpl) FindCommentByIdHdl(ctx *gin.Context) {
 	commentId := ctx.Param("id")
 
@@ -103,7 +103,7 @@ func (c *CommentHandlerImpl) FindCommentByIdHdl(ctx *gin.Context) {
 // @Success 200 {object} response.SuccessResponse{data=object}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /comment [post]
+// @Router /comments [post]
 func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
@@ -114,6 +114,7 @@ func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
 				Message: response.SomethingWentWrong,
 				Error:   err.Error(),
 			})
+			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -173,7 +174,7 @@ func (c *CommentHandlerImpl) CreateCommentHdl(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /comment/{id} [put]
+// @Router /comments/{id} [put]
 func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
 	commentId := ctx.Param("id")
 	
@@ -194,7 +195,11 @@ func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
 	if !ok {
 		err := errors.New("error get claim from context")
 		if err != nil {
-			panic(err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+				Message: response.SomethingWentWrong,
+				Error:   err.Error(),
+			})
+			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -221,50 +226,6 @@ func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
 		})
 		return
 	}
-
-	// //get basicauth username and password
-	// // Retrieve the value and check if the key exists
-	// basicClaimRaw, ok := ctx.Get("userBasic")
-
-	// // Check if the key exists
-	// if !ok {
-	// 	// Handle the case when the key does not exist
-	// 	err := errors.New("error getting basic auth claim from context")
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
-	// 		Message: response.InvalidPayload,
-	// 		Error:   "invalid username and password",
-	// 	})
-	// 	return
-	// }
-
-	// // Convert the value to the expected type
-	// basicClaim, ok := basicClaimRaw.(map[string]string)
-
-	// // Check if the conversion was successful
-	// if !ok {
-	// 	// Handle the case when the value is not of the expected type
-	// 	err := errors.New("error converting basic auth claim to map[string]string")
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
-	// 		Message: response.InvalidPayload,
-	// 		Error:   "invalid username and password",
-	// 	})
-	// 	return
-	// }
-
-	// // Now you can access the values in the basicClaim map
-	// if basicClaim["username"] != "admin" || basicClaim["password"] != "admin" {
-	// 	ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
-	// 		Message: response.InvalidPayload,
-	// 		Error:   "invalid username and password",
-	// 	})
-	// 	return
-	// }
 
 	comment, err := c.commentService.UpdateCommentSvc(ctx, updateComment, commentId)
 	if err != nil {
@@ -301,7 +262,7 @@ func (c *CommentHandlerImpl) UpdateCommentHdl(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /comment/{id} [delete]
+// @Router /comments/{id} [delete]
 func (c *CommentHandlerImpl) DeleteCommentByIdHdl(ctx *gin.Context) {
 	commentId := ctx.Param("id")
 
@@ -310,7 +271,11 @@ func (c *CommentHandlerImpl) DeleteCommentByIdHdl(ctx *gin.Context) {
 	if !ok {
 		err := errors.New("error get claim from context")
 		if err != nil {
-			panic(err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+				Message: response.SomethingWentWrong,
+				Error:   err.Error(),
+			})
+			return
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,

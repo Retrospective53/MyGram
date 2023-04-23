@@ -21,18 +21,14 @@ func NewCommentServiceImpl(commentRepo commentrepo.CommentRepo) CommentService {
 
 func (c *CommentServiceImpl) FindAllCommentsSvc(ctx context.Context) (comments []models.Comment, err error) {
 	comments, err = c.commentRepo.FindAllComment(ctx)
-	if err != nil {
-		panic(err)
-	}
+
 
 	return
 }
 
 func (c *CommentServiceImpl) FindCommentByIdSvc(ctx context.Context, commentId string) (comment models.Comment, err error) {
 	comment, err = c.commentRepo.FindCommentById(ctx, commentId)
-	if err != nil {
-		panic(err)
-	}
+
 
 	return
 }
@@ -55,25 +51,19 @@ func (c *CommentServiceImpl) CreateCommentSvc(ctx context.Context, commentIn com
 		PhotoID: photoUUID,
 		UserID: userUUID,
 	}, userId)
-	if err != nil {
-		panic(err)
-	}
+
 
 	return
 }
 
 func (c *CommentServiceImpl) UpdateCommentSvc(ctx context.Context, commentIn models.Comment, commentId string) (comment models.Comment, err error) {
 	comment, err = c.commentRepo.UpdateComment(ctx, commentIn, commentId)
-	if err != nil {
-		panic(err)
-	}
+
 	return
 }
 
 func (c *CommentServiceImpl) DeleteCommentByIdSvc(ctx context.Context, commentId string) (comment models.Comment, err error) {
 	err = c.commentRepo.DeleteCommentById(ctx, commentId)
-	if err != nil {
-		panic(err)
-	}
+
 	return
 }

@@ -50,7 +50,7 @@ func NewPhotoHandlerImpl(photoService photoservice.PhotoService) PhotoHandler {
 // @Success 200 {object} response.SuccessResponse{data=[]string}
 // @Success 401 {object} response.SuccessResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /photo/all [get]
+// @Router /photos/all [get]
 func (p *PhotoHandlerImpl) FindAllPhotosHdl(ctx *gin.Context) {
 	photos, err := p.photoService.FindAllPhotosSvc(ctx)
 	if err != nil {
@@ -78,7 +78,7 @@ func (p *PhotoHandlerImpl) FindAllPhotosHdl(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /photo/{id} [get]
+// @Router /photos/{id} [get]
 func (p *PhotoHandlerImpl) FindPhotoByIdHdl(ctx *gin.Context) {
 	photoId := p.getIdFromParamStr(ctx)
 
@@ -117,14 +117,17 @@ func (p *PhotoHandlerImpl) FindPhotoByIdHdl(ctx *gin.Context) {
 // @Success 200 {object} response.SuccessResponse{data=object}
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /photo [post]
+// @Router /photos [post]
 func (p *PhotoHandlerImpl) CreatePhotoHdl(ctx *gin.Context) {
 	// get user_id from context first
 	accessClaimI, ok := ctx.Get(middleware.AccessClaim.String())
 	if !ok {
 		err := errors.New("error get claim from context")
 		if err != nil {
-			panic(err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+				Message: response.SomethingWentWrong,
+				Error:   err.Error(),
+			})
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -184,7 +187,7 @@ func (p *PhotoHandlerImpl) CreatePhotoHdl(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /photo/{id} [put]
+// @Router /photos/{id} [put]
 func (p *PhotoHandlerImpl) UpdatePhotoHdl(ctx *gin.Context) {
 	photoId := p.getIdFromParamStr(ctx)
 	
@@ -205,7 +208,10 @@ func (p *PhotoHandlerImpl) UpdatePhotoHdl(ctx *gin.Context) {
 	if !ok {
 		err := errors.New("error get claim from context")
 		if err != nil {
-			panic(err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+				Message: response.SomethingWentWrong,
+				Error:   err.Error(),
+			})
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
@@ -268,7 +274,7 @@ func (p *PhotoHandlerImpl) UpdatePhotoHdl(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse{}
 // @Failure 401 {object} response.ErrorResponse{}
 // @Failure 500 {object} response.ErrorResponse{}
-// @Router /photo/{id} [delete]
+// @Router /photos/{id} [delete]
 func (p *PhotoHandlerImpl) DeletePhotoByIdHdl(ctx *gin.Context) {
 	photoId := p.getIdFromParamStr(ctx)
 
@@ -277,7 +283,10 @@ func (p *PhotoHandlerImpl) DeletePhotoByIdHdl(ctx *gin.Context) {
 	if !ok {
 		err := errors.New("error get claim from context")
 		if err != nil {
-			panic(err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
+				Message: response.SomethingWentWrong,
+				Error:   err.Error(),
+			})
 		}
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse{
 			Message: response.InvalidPayload,
