@@ -1,6 +1,6 @@
 # MyGram Golang Backend
 
-This is the backend for MyGram, an application that allows users to save photos and make comments on other people's photos. It is built using Golang and utilizes various libraries and technologies for authentication, validation, and documentation.
+This is the backend for MyGram, an application that allows users to save photos and make comments on other people's photos. It is built using Golang and utilizes various libraries and tools for authentication, validation, and documentation.
 
 ## Dependencies
 
